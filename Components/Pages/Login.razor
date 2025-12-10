@@ -1,0 +1,66 @@
+@page "/login"
+@rendermode InteractiveServer
+@layout MyBlazorApp.Components.Layout.EmptyLayout
+
+@inject MyBlazorApp.Services.AuthService Auth
+@inject NavigationManager Nav
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStore
+
+<div class="login-container">
+    <div class="login-box">
+        <h3>Login</h3>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="error-msg">@error</div>
+        }
+
+        <div class="form-group">
+            <input placeholder="Username" @bind="username" />
+        </div>
+
+        <div class="form-group">
+            <input placeholder="Password" type="password" @bind="password" />
+        </div>
+
+        <button class="btn-login" @onclick="DoLogin">Masuk</button>
+    </div>
+</div>
+
+@code {
+    string username = "";
+    string password = "";
+    string error = "";
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await SessionStore.GetAsync<string>("token");
+
+            if (result.Success && !string.IsNullOrEmpty(result.Value))
+            {
+                Nav.NavigateTo("/dashboard", true);
+            }
+        }
+    }
+    private async Task DoLogin()
+    {
+        var result = await Auth.Login(username, password);
+
+        if (result == null)
+        {
+            error = "Server tidak merespon.";
+            return;
+        }
+
+        if (result.status == 1)
+        {
+            await SessionStore.SetAsync("token", result.token);
+            Nav.NavigateTo("/dashboard", true);
+        }
+        else
+        {
+            error = result.pesan;
+        }
+    }
+}

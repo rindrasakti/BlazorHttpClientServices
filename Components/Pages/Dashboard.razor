@@ -1,0 +1,31 @@
+@page "/dashboard"
+@rendermode InteractiveServer
+
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStore
+@inject NavigationManager Nav
+
+<h3>Dashboard</h3>
+
+<pre>@token</pre>
+
+@code {
+    string? token = "";
+ 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await SessionStore.GetAsync<string>("token");
+            token = result.Success ? result.Value : "";
+
+            if (string.IsNullOrEmpty(token))
+            {
+                Nav.NavigateTo("/login", true);
+            }
+
+   
+            StateHasChanged();
+        }
+    }
+}

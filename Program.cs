@@ -1,0 +1,39 @@
+using MyBlazorApp.Client.Pages;
+using MyBlazorApp.Components;
+using MyBlazorApp.Services;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
+// tambahan untuk AuthService dan ProtectedSessionStorage
+  builder.Services.AddHttpClient();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseWebAssemblyDebugging();
+}
+else
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseAntiforgery();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(MyBlazorApp.Client._Imports).Assembly);
+
+app.Run();
