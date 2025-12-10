@@ -1,4 +1,3 @@
-using MyBlazorApp.Client.Pages;
 using MyBlazorApp.Components;
 using MyBlazorApp.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -33,7 +32,6 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(MyBlazorApp.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();
 
 app.Run();
